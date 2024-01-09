@@ -48,7 +48,6 @@ import { eventBus } from '@/main';
                 type: Object,
                 default() {
                     return {
-
                     };
                 }
             },

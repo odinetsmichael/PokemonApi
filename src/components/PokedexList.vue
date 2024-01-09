@@ -34,7 +34,7 @@
 <script>
 import PokemonInfo from './PokemonInfo.vue'
 import Card from './Card';
-import {getPokemonList, getPokemonByUrl,} from './pokedex.service';
+import { pokemonService } from '../clients/pokemonService';
 
 
 export default {
@@ -43,56 +43,25 @@ export default {
   data() {
     return {
       pokemonList: [],
-      next: null,
-      mountCount: 0,
+      offset: 0,
     };
   },
   methods: {
-    async  getPokemonData(name){
-
-      const response = await getPokemonByUrl(`https://pokeapi.co/api/v2/pokemon/${name}`);
-
-      const pokemonStats = {
-
-        weight: response.data.weight,
-        image: response.data.sprites.other.home.front_default,
-        moves: response.data.moves.length,
-        types: response.data.types.map((t) => {
-          return t.type.name;
-        })
-      }
-
-      response.data.stats.forEach((s) => {
-          pokemonStats[`${s.stat.name}`] = s.base_stat;
-      })
-      
-      return pokemonStats;
-    },
 
     async loadMore(){
-      if (this.next){
-        const responseData = await getPokemonList(this.next);
-        this.next = responseData.next;
-        responseData.results.forEach(async (p) => {
-          let stats = await this.getPokemonData(p.name);
-          this.pokemonList.push({...p, ...stats});
-        });
+      if (this.offset){
+        const responseData = await pokemonService.getPokemonList(this.offset);
+        this.offset = responseData.nextOffset;
+        this.pokemonList.push(...responseData.pokemonList);
       }
-    },
+    }
 
   },
   
   async mounted() {
-    const responseData = await getPokemonList('https://pokeapi.co/api/v2/pokemon/?limit=12');
-    const pokemons = [];
-
-    for (let i = 0; i < responseData.results.length; i++){
-      let stats = await this.getPokemonData(responseData.results[i].name)
-      pokemons.push({...responseData.results[i], ...stats})
-    }
-
-    this.next = responseData.next;
-    this.pokemonList = pokemons;
+    const responseData = await pokemonService.getPokemonList(this.offset);
+    this.offset = responseData.nextOffset;
+    this.pokemonList = responseData.pokemonList;
   }
 }
 
@@ -147,3 +116,25 @@ export default {
   }
 }
 </style>
+
+
+
+<!--
+
+  ЗАПУСКАЕМ░░
+░ГУСЯ░▄▀▀▀▄░ГИДРУ░░
+▄███▀░◐░▄▀▀▀▄░░░░░░
+░░▄███▀░◐░░░░▌░░░
+░░░▐░▄▀▀▀▄░░░▌░░░░
+▄███▀░◐░░░▌░░▌░░░░
+░░░░▌░░░░░▐▄▄▌░░░░░
+░░░░▌░░░░▄▀▒▒▀▀▀▀▄
+░░░▐░░░░▐▒▒▒▒▒▒▒▒▀▀▄
+░░░▐░░░░▐▄▒▒▒▒▒▒▒▒▒▒▀▄
+░░░░▀▄░░░░▀▄▒▒▒▒▒▒▒▒▒▒▀▄
+░░░░░░▀▄▄▄▄▄█▄▄▄▄▄▄▄▄▄▄▄▀▄
+░░░░░░░░░░░▌▌░▌▌░░░░░
+░░░░░░░░░░░▌▌░▌▌░░░░░
+░░░░░░░░░▄▄▌▌▄▌▌░░░░░
+
+-->
