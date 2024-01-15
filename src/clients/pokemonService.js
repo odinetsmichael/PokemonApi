@@ -3,17 +3,21 @@ import { client } from './pokemonClient.js';
 export let pokemonService = (function(){
 
     async function getPokemonList(offset, limit=12){
-        try {
+         try {
 
-        if(offset == null){
-            console.log("Max pokemon count reached");
-            return;
-        } 
+
 
         let responseData = await client.getAll(offset, limit);
-        let urlSearchParams = new URLSearchParams(new URL(responseData.next).search);
-      
-        let nextOffset = urlSearchParams.get('offset');
+        
+        let nextOffset = responseData.next != null 
+            ? new URLSearchParams(new URL(responseData.next).search).get('offset')
+            : null;
+        
+
+        // let urlSearchParams = new URLSearchParams(new URL(responseData.next).search);
+        // console.log(responseData.next);
+
+        // let nextOffset = urlSearchParams.get('offset');
 
         let pokemonList = await Promise.all(responseData.results.map(async function (item) {
             let pokeInfo = await client.getByName(item.name);

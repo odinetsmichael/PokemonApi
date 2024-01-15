@@ -96,7 +96,7 @@ img{
         display: grid;
         border: 2px solid #020202;
         grid-template-rows: 1fr;
-        margin: 20px;
+        margin: 10px;
         @media (max-width: 768px) {
             margin: 0;
         }

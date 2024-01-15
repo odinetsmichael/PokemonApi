@@ -14,6 +14,7 @@
           
           <button class="btn btn-primary"
                   @click="loadMore"
+                  :disabled="disabled()"
           >
             Load More
           </button>
@@ -47,15 +48,18 @@ export default {
     };
   },
   methods: {
-
     async loadMore(){
-      if (this.offset){
+      if (this.offset !== null){
         const responseData = await pokemonService.getPokemonList(this.offset);
         this.offset = responseData.nextOffset;
         this.pokemonList.push(...responseData.pokemonList);
       }
+    },
+    disabled(){
+      if (this.offset === null){
+        return true;
+      }
     }
-
   },
   
   async mounted() {
